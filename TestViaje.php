@@ -1,0 +1,373 @@
+<?php
+include "Viaje.php";
+
+/* Esta función se encarga de desplegar el menu en pantalla
+    @return int $respuesta */
+function llamaMenu(){
+    do {
+        echo "*** Bienvenido a la carga de viajes de la empresa Viaje feliz ***"."\n";
+        echo  "Indique la acción que quiere realizar:"."\n";
+        echo "1) Cargar un nuevo viaje"."\n";
+        echo "2) Modificar datos del viaje (no incluye pasajeros)"."\n";
+        echo "3) Ver datos del viaje"."\n";
+        echo "4) Cargar un nuevo pasajero al viaje"."\n";
+        echo "5) Modificar un pasajero"."\n";
+        echo "6) Eliminar un pasajero"."\n";
+        echo "7) Ver datos de un pasajero"."\n";
+        echo "Si desea terminar con el programa, ingrese 0" . "\n";
+        $respuesta = trim(fgets(STDIN));
+    
+        }while(($respuesta<0  || $respuesta>8) || !is_numeric($respuesta));
+        return $respuesta;
+}
+//Verifica que el dni ingresado sea de 7 u 8 dígitos.
+    // @param int $dni
+    // @return boolean $valido
+function verificaFormatoDNI($dni){
+    
+    if ($dni < 99999 || $dni > 99999999){
+        $valido = false;
+    } else { 
+        $valido = true;
+    }
+    return !$valido;
+}
+
+/*Esta función se encarga de que el DNI a cargar no se encuentre ya en el arreglo
+    @param array $pasajeros son los pasajeros ya cargados
+    @return int $dniPasajeros */
+function verificaDNI($pasajeros){
+    do{
+        $ciclo = false;
+        echo 'Ingrese el DNI del pasajero: ' . "\n";
+        $dniPasajero = trim(fgets(STDIN));
+        if (!is_int($dniPasajero)){
+            if (verificaFormatoDNI($dniPasajero)){
+                echo 'El DNI ingresado es invalido, intente nuevamente' . "\n";
+                $ciclo = true;
+            } else {
+                if(!empty($pasajeros)){
+                    $coincide = false;
+                    $i = 0;
+                    while($i < count($pasajeros) && !$coincide){
+                        $coincide = $pasajeros[$i]['dni'] == $dniPasajero;
+                        $i++;
+                    }
+                    if ($coincide){
+                        echo 'El DNI ingresado ya se encontraba cargado, intente con otro'. "\n";
+                        $ciclo = true;
+                    } 
+                }
+            }
+        } else {
+            echo 'No se ingresó un DNI valido, intente nuevamente'. "\n";
+            $ciclo = true;
+        }
+    }while($ciclo);
+    return $dniPasajero;
+}
+
+/* Verifica que se ingrese algo y no quede vacío
+    @param string $stringAMostrar
+    @return $nombrePasajero */
+function verificaIngreso($stringAMostrar){
+    
+    do{
+        echo $stringAMostrar;
+        $dato = trim(fgets(STDIN));
+    }while(empty($dato));
+    return $dato;
+}
+
+/* Esta función se encarga de realizar la carga de los pasajeros 
+ @param int $cantMax es la cantidad máxima de pasajeros que van en un  viaje
+ @return array $pasajeros */
+function cargaPasajeros($cantMax){
+
+    $pasajeros = array();
+    do {
+    if (count($pasajeros) < $cantMax){
+        $dniPasajero = verificaDNI($pasajeros);
+        $nombrePasajero = verificaIngreso("Ingrese el nombre del pasajero: \n");
+        $apellidoPasajero = verificaIngreso("Ingrese el apellido del pasajero: \n");
+        $datosPasajero = array("dni" => $dniPasajero,
+                          "nombre" => $nombrePasajero,
+                          "apellido" => $apellidoPasajero);
+        array_push($pasajeros, $datosPasajero);
+        $respuesta = pregunta();
+    }else{
+            echo 'No se pueden ingresar más pasajeros, ha llegado a la cantidad máxima' . "\n";
+            $respuesta = false;
+        } 
+    }while($respuesta);
+    return $pasajeros;
+}
+    /* Esta función se encarga de realizar la carga de los pasajeros cuando ya hay datos cargados previamente
+    @param int $cantMax es la cantidad máxima de pasajeros que van en un  viaje
+    @param array $pasajeros
+     @return array $pasajeros */
+function cargaPasajeros2($pasajeros, $cantMax){
+
+        do {
+            if (count($pasajeros) > $cantMax){
+            $dniPasajero = verificaDNI($pasajeros);
+            $nombrePasajero = verificaIngreso("Ingrese el nombre del pasajero: \n");
+            $apellidoPasajero = verificaIngreso("Ingrese el apellido del pasajero: \n");
+            $datosPasajero = array("dni" => $dniPasajero,
+                              "nombre" => $nombrePasajero,
+                              "apellido" => $apellidoPasajero);
+            array_push($pasajeros, $datosPasajero);
+            $respuesta = pregunta(); 
+        }else{
+        echo 'No se pueden ingresar más pasajeros, ha llegado a la cantidad máxima' . "\n";
+        $respuesta = false;
+        } 
+        }while($respuesta);
+        return $pasajeros;
+}
+/*Esta función se encarga de preguntarle al usuario si quiere ingresar
+    otro pasajero y para cuando recibe una respuesta valida.
+    @return boolean $ingresoUsuario */
+function pregunta(){
+    
+    $ciclo = true;
+    do{
+    echo 'Desea ingresar otro pasajero? ingrese si o no' . "\n";
+    $respuesta = trim(fgets(STDIN));
+    $respuesta = strtolower($respuesta);
+   
+    if ($respuesta== 'si' || $respuesta == 'no'){
+        $ciclo = false;
+        $ingresoUsuario = $respuesta== 'si' ? true : false;
+    } else {
+        echo 'Ingreso una respuesta incorrecta, intente nuevamente.' . "\n";
+    }
+    }while($ciclo);
+    return $ingresoUsuario;
+}
+/* Esta función se encarga de modificar el dato del viaje que se necesite, ya preguntado anteriormente
+    @param Viaje $viaje 
+    @param int $modificacion
+    @return Viaje $viaje */
+function modificarViaje($viaje, $modificacion){
+    
+    switch($modificacion){
+        case 1: 
+            echo "Ingrese el código de viaje nuevo: ";
+            $nuevoCodViaje = trim(fgets(STDIN));
+            $viaje->setCodViaje($nuevoCodViaje);
+            break;
+        case 2: 
+            echo "Ingrese el destino nuevo: ";
+            $nuevoDestino = trim(fgets(STDIN));
+            $viaje->setDestino($nuevoDestino);
+            break;
+        case 3:
+            echo "Ingrese la cantidad máxima de pasajeros nueva: ";
+            $nuevoCantMax = trim(fgets(STDIN));
+            $viaje->setCantMaximaPasajeros($nuevoCantMax);
+            break;
+    }
+    return $viaje;
+}  
+/* Esta función se encarga de verificar que el dni ingresado cumpla con el formato de DNI y que se encuentre cargado
+    @param int $dniModificar
+    @param array $pasajerosCargados 
+    @return boolean $encontrado */
+function compruebaDNIAModificar($dniModificar, $pasajerosCargados){
+  
+    $encontrado = false;
+    if (!verificaFormatoDNI($dniModificar)){
+        $i = 0;
+        while($i < count($pasajerosCargados) && !$encontrado){
+            $encontrado = $pasajerosCargados[$i]['dni'] == $dniModificar;
+            $i++;
+        }
+    }
+    return $encontrado;
+}
+ /* Esta función se encarga de modificar el dato del pasajero, depende del parámetro modificación
+    @param int $dniPasajero
+    @param int $modificacion
+    @param array $pasajerosCargados
+    @return array $pasajerosCargados */
+function modificarPasajero($dniPasajero,$modificacion,$pasajerosCargados){
+   
+    $i = 0;
+    $encontrado = false;
+    while($i < count($pasajerosCargados) && !$encontrado){
+        $encontrado = $pasajerosCargados[$i]['dni'] == $dniPasajero;
+        $i++;
+    }
+    switch($modificacion){
+        case 1: 
+            $pasajerosCargados[$i-1]['dni'] = $dniPasajero;
+            break;
+        case 2: 
+            $nuevoNombre = verificaIngreso("Ingrese el nuevo nombre: \n");
+            $pasajerosCargados[$i-1]['nombre'] = $nuevoNombre;
+            break;
+        case 3:
+            $nuevoApellido = verificaIngreso("Ingrese el nuevo apellido: \n");
+            $pasajerosCargados[$i-1]['apellido'] = $nuevoApellido;
+            break;
+    }
+    return $pasajerosCargados;
+
+}
+/*Esta función se encarga de eliminar pasajeros, busca por el DNI 
+    @param int $dniAEliminar
+    @param array $pasajerosEliminar
+    @return array $pasajerosEliminar */
+function eliminaPasajeros($dniAEliminar,$pasajerosEliminar){
+    
+    $i = 0;
+    $encontrado = false;
+    while($i < count($pasajerosEliminar) && !$encontrado){
+        $encontrado = $pasajerosEliminar[$i]['dni'] == $dniAEliminar;
+        $i++;
+    }
+    array_splice($pasajerosEliminar,$i-1,1);
+    return $pasajerosEliminar;
+}
+/*Esta función se encarga de mostrar los datos del pasajero con el dni pasado por parámetro
+    @param int $dniAMostrar
+    @param array $pasajerosCargados*/
+function muestraPasajero($dniAMostrar,$pasajerosCargados){
+    
+    $i = 0;
+    $encontrado = false;
+    while($i < count($pasajerosCargados) && !$encontrado){
+        $encontrado = $pasajerosCargados[$i]['dni'] == $dniAMostrar;
+        if ($encontrado){
+            echo "Pasajero: " . ($i+1) . "\n";
+            echo "DNI: ". $pasajerosCargados[$i]['dni']."\n";
+            echo "Nombre: ". $pasajerosCargados[$i]['nombre']."\n";
+            echo "Apellido: ". $pasajerosCargados[$i]['apellido']."\n";
+        } else {
+        $i++;}
+    }
+}
+
+/*------- PROGRAMA PRINCIPAL -------*/
+$ingresaUsuario = llamaMenu();
+do {
+    switch($ingresaUsuario){
+        case 1: 
+            $codViaje = verificaIngreso("Ingrese el código del viaje: \n");;
+            $des = verificaIngreso("Ingrese el destino: \n");;
+            $cantMax = verificaIngreso("Ingrese la cantidad máxima de pasajeros: \n");;
+            $pasajeros = cargaPasajeros($cantMax);
+            $viaje = new Viaje($codViaje, $des, $cantMax, $pasajeros);
+            $ingresaUsuario = llamaMenu();
+            break;
+        case 2: 
+            if (!empty($viaje)){
+                do {
+                echo 'Ingrese qué dato quiere modificar: ' . "\n";
+                echo '1) Código de viaje' . "\n";
+                echo '2) Destino ' . "\n";
+                echo '3) Cantidad máxima de pasajeros '."\n";
+                $modificacion = trim(fgets(STDIN));
+                } while(($modificacion<1  || $modificacion>4) || !is_numeric($modificacion));
+                $viaje = modificarViaje($viaje, $modificacion);
+                $ingresaUsuario = llamaMenu();
+            } else {
+                echo "Todavía no ha ingresado un viaje para poder modificar, presione la opción 1 para hacerlo" . "\n";
+                $ingresaUsuario = llamaMenu();
+            }
+            break;
+        case 3: 
+            if (!empty($viaje)){
+                echo $viaje;
+                $ingresaUsuario = llamaMenu();
+            } else {
+                echo "Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo" . "\n";
+                $ingresaUsuario = llamaMenu();
+            }
+            break;
+        case 4:
+            if (!empty($viaje)){
+            $pasajerosNuevo = $viaje->getPasajeros();
+            $pasajerosNuevo = cargaPasajeros2($pasajerosNuevo, $viaje->getCantMaximaPasajeros());
+            $viaje->setPasajeros($pasajerosNuevo);
+            echo 'Se ha ingresado el nuevo pasajero correctamente' . "\n";
+            $ingresaUsuario = llamaMenu();
+            break;} else {
+                echo "Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo" . "\n";
+                $ingresaUsuario = llamaMenu();
+            }
+        case 5:
+            if (!empty($viaje)){
+                $pasajerosModificar = $viaje->getPasajeros();
+                do {
+                echo "Ingrese el DNI del pasajero a modificar: \n";
+                $dniAModificar = trim(fgets(STDIN));
+                if (!compruebaDNIAModificar($dniAModificar,$pasajerosModificar)){
+                    echo 'DNI incorrecto, ingrese nuevamente' . "\n";
+                    $ciclo = true;
+                } else {
+                    $ciclo = false;
+                }
+                }while(empty($dniAModificar) || $ciclo);
+                do {
+                echo "¿Qué dato desea modificar? \n";
+                echo "1) Documento de identidad \n";
+                echo "2) Nombre \n";
+                echo "3) Apellido \n";
+                $modificacion = trim(fgets(STDIN));
+                }while(empty($modificacion) || !is_numeric($modificacion));
+                $pasajerosModificar = modificarPasajero($dniAModificar,$modificacion,$pasajerosModificar);
+                echo 'Se ha modificado el pasajero correctamente' . "\n";
+                $viaje->setPasajeros($pasajerosModificar);
+                $ingresaUsuario = llamaMenu();
+            } else {
+                echo 'Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo' . "\n";
+                $ingresaUsuario = llamaMenu();
+            }
+        break;
+        case 6: 
+            if(!empty($viaje)){
+                $pasajerosEliminar = $viaje->getPasajeros();
+                do {
+                echo "Ingrese el DNI del pasajero a eliminar: \n";
+                $dniAEliminar = trim(fgets(STDIN));
+                if (!compruebaDNIAModificar($dniAEliminar,$pasajerosEliminar)){
+                    echo 'DNI incorrecto, ingrese nuevamente' . "\n";
+                    $ciclo = true;
+                } else {
+                    $ciclo = false;
+                }
+                }while(empty($dniAEliminar) || $ciclo);
+                $pasajerosEliminar = eliminaPasajeros($dniAEliminar,$pasajerosEliminar);
+                echo 'Se ha eliminado el pasajero correctamente' . "\n";
+                $viaje->setPasajeros($pasajerosEliminar);
+                $ingresaUsuario = llamaMenu();
+            } else{
+                echo 'Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo' . "\n";
+                $ingresaUsuario = llamaMenu();
+            }
+        break;
+        case 7:
+            if(!empty($viaje)){
+                $pasajerosCargados = $viaje->getPasajeros();
+                do {
+                echo "Ingrese el DNI del pasajero a mostrar: \n";
+                $dniAMostrar = trim(fgets(STDIN));
+                if (!compruebaDNIAModificar($dniAMostrar,$pasajerosCargados)){
+                    echo 'DNI incorrecto, ingrese nuevamente' . "\n";
+                    $ciclo = true;
+                } else {
+                    $ciclo = false;
+                }
+                }while(empty($dniAMostrar) || $ciclo);
+                muestraPasajero($dniAMostrar,$pasajerosCargados);
+                $ingresaUsuario = llamaMenu();
+            } else {
+                echo 'Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo' . "\n";
+                $ingresaUsuario = llamaMenu();
+            }
+        break;
+    }
+} while($ingresaUsuario <> 0);
+?>
