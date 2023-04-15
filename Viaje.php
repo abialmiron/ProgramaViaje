@@ -7,7 +7,7 @@ class Viaje{
     private $cantMaximaPasajeros;
     private $pasajeros;
 
-    /*Metodo constructor */
+    /************* Metodo constructor *************/
     public function __construct($codviaje, $des, $cantmaxpasajeros, $pas){
         $this->cod_viaje = $codviaje;
         $this->destino = $des;
@@ -16,18 +16,18 @@ class Viaje{
     }
 
     /*************** SETTERS Y GETTERS ********************/
-    /*Coloca el valor pasado por parámetro en el atributo cod_viaje
-    @param int $codviaje */
+    /** Coloca el valor pasado por parámetro en el atributo cod_viaje
+    *@param int $codviaje */
     public function setCodViaje($codviaje){
         $this->cod_viaje = $codviaje;
     }
-    /*Devuelve el valor actual almacenado en el atributo cod_viaje
-    @return int */
+    /** Devuelve el valor actual almacenado en el atributo cod_viaje
+    * @return int */
     public function getCodViaje(){
         return $this->cod_viaje;
     }
-    /*Coloca el valor pasado por parámetro en el atributo destino
-    @param string $des */
+    /** Coloca el valor pasado por parámetro en el atributo destino
+    * @param string $des */
     public function setDestino($des){
         $this->destino = $des;
     }
@@ -36,22 +36,25 @@ class Viaje{
     public function getDestino(){
         return $this->destino;
     }
-    /*Coloca el valor pasado por parámetro en el atributo cantMaximaPasajeros
-    @param int $cantMaxPasajeros */
+    /** Coloca el valor pasado por parámetro en el atributo cantMaximaPasajeros
+    * @param int $cantMaxPasajeros 
+    */
     public function setCantMaximaPasajeros($cantMaxPasajeros){
         $this->cantMaximaPasajeros = $cantMaxPasajeros;
     }
-    /*Devuelve el valor actual almacenado en el atributo cantMaximaPasajeros
-    @return int $cantMaximaPasajeros*/
+    /** Devuelve el valor actual almacenado en el atributo cantMaximaPasajeros
+    * @return int $cantMaximaPasajeros
+    */
     public function getCantMaximaPasajeros(){
         return $this->cantMaximaPasajeros;
     }
-    /*Coloca el valor pasado por parámetro en el atributo pasajeros 
-    @param array $pasajeros */
+    /** Coloca el valor pasado por parámetro en el atributo pasajeros 
+    *@param array $pasajeros 
+    */
     public function setPasajeros($pasajeros){
         $this->pasajeros = $pasajeros;
     }
-    /*Devuelve el valor actual almacenado en el atributo pasajeros
+    /** Devuelve el valor actual almacenado en el atributo pasajeros
     * @return array $pasajeros
     */
     public function getPasajeros(){
@@ -123,7 +126,19 @@ class Viaje{
         $colPasajeros[$indice]['apellido'] = $nuevoApellido;
         $this->setPasajeros($colPasajeros);
     }
-    
+    /** Este método se encarga de agregar un nuevo pasajero en la colección de pasajeros
+     * @param int $dniNuevo
+     * @param string $nombreNuevo
+     * @param string $apellidoNuevo
+     */
+    public function agregarPasajero($dniNuevo, $nombreNuevo,$apellidoNuevo){
+        $colPasajeros = $this->getPasajeros();
+        if($this->getCantMaximaPasajeros() >= count($colPasajeros)){
+            $colPasajeros[] = ["dni" => $dniNuevo,"nombre" => $nombreNuevo, "apellido" => $apellidoNuevo];
+            $this->setPasajeros($colPasajeros);
+        }
+    }
+
     public function __toString(){
         return "Código de viaje: " . $this->getCodViaje() . "\n".  
         "Destino: " . $this->getDestino() . "\n" .

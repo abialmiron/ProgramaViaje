@@ -47,16 +47,11 @@ function verificaDNI($pasajeros){
                 $ciclo = true;
             } else {
                 if(!empty($pasajeros)){
-                    $coincide = false;
-                    $i = 0;
-                    while($i < count($pasajeros) && !$coincide){
-                        $coincide = $pasajeros[$i]['dni'] == $dniPasajero;
-                        $i++;
-                    }
-                    if ($coincide){
+                    $existe = $viaje->buscaPasajero($dniPasajero);
+                    if ($existe <> -1){
                         echo 'El DNI ingresado ya se encontraba cargado, intente con otro'. "\n";
                         $ciclo = true;
-                    } 
+                    }
                 }
             }
         } else {
@@ -174,46 +169,33 @@ function modificarViaje($viaje, $modificacion){
     @param int $dniModificar
     @param array $pasajerosCargados 
     @return boolean $encontrado */
-function compruebaDNIAModificar($dniModificar, $pasajerosCargados){
+function compruebaDNIAModificar($dniModificar){
   
-    $encontrado = false;
     if (!verificaFormatoDNI($dniModificar)){
-        $i = 0;
-        while($i < count($pasajerosCargados) && !$encontrado){
-            $encontrado = $pasajerosCargados[$i]['dni'] == $dniModificar;
-            $i++;
-        }
+        $existe = $viaje->buscaPasajero($dniAModificar);
+        $encontrado = ($existe <> -1);
     }
     return $encontrado;
 }
- /* Esta función se encarga de modificar el dato del pasajero, depende del parámetro modificación
-    @param int $dniPasajero
-    @param int $modificacion
-    @param array $pasajerosCargados
-    @return array $pasajerosCargados */
-function modificarPasajero($dniPasajero,$modificacion,$pasajerosCargados){
-   
-    $i = 0;
-    $encontrado = false;
-    while($i < count($pasajerosCargados) && !$encontrado){
-        $encontrado = $pasajerosCargados[$i]['dni'] == $dniPasajero;
-        $i++;
-    }
+ /** Esta función se encarga de modificar el dato del pasajero, depende del parámetro modificación
+ *   @param int $dniPasajero
+ *   @param int $modificacion
+ */
+function modificarPasajero($dniPasajero,$modificacion){
     switch($modificacion){
         case 1: 
-            $pasajerosCargados[$i-1]['dni'] = $dniPasajero;
+            $nuevoDNI = verificaIngreso("Ingrese el nuevo DNI: \n");
+            $viaje->modificarDniPasajero($dniPasajero, $nuevoDNI);
             break;
         case 2: 
             $nuevoNombre = verificaIngreso("Ingrese el nuevo nombre: \n");
-            $pasajerosCargados[$i-1]['nombre'] = $nuevoNombre;
+            $viaje->modificarNombrePasajero($dniPasajero, $nuevoNombre);
             break;
         case 3:
             $nuevoApellido = verificaIngreso("Ingrese el nuevo apellido: \n");
-            $pasajerosCargados[$i-1]['apellido'] = $nuevoApellido;
+            $viaje->modificarApellidoPasajero($dniPasajero, $nuevoApellido);
             break;
     }
-    return $pasajerosCargados;
-
 }
 /*Esta función se encarga de eliminar pasajeros, busca por el DNI 
     @param int $dniAEliminar
@@ -303,7 +285,7 @@ do {
                 do {
                 echo "Ingrese el DNI del pasajero a modificar: \n";
                 $dniAModificar = trim(fgets(STDIN));
-                if (!compruebaDNIAModificar($dniAModificar,$pasajerosModificar)){
+                if (!compruebaDNIAModificar($dniAModificar)){
                     echo 'DNI incorrecto, ingrese nuevamente' . "\n";
                     $ciclo = true;
                 } else {
@@ -317,7 +299,7 @@ do {
                 echo "3) Apellido \n";
                 $modificacion = trim(fgets(STDIN));
                 }while(empty($modificacion) || !is_numeric($modificacion));
-                $pasajerosModificar = modificarPasajero($dniAModificar,$modificacion,$pasajerosModificar);
+                $pasajerosModificar = modificarPasajero($dniAModificar,$modificacion);
                 echo 'Se ha modificado el pasajero correctamente' . "\n";
                 $viaje->setPasajeros($pasajerosModificar);
                 $ingresaUsuario = llamaMenu();
