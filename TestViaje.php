@@ -1,5 +1,7 @@
 <?php
 include "Viaje.php";
+include "Pasajero.php";
+include "ResponsableV.php";
 
 /* Esta función se encarga de desplegar el menu en pantalla
     @return int $respuesta */
@@ -35,19 +37,21 @@ function verificaFormatoDNI($dni){
 
 /*Esta función se encarga de que el DNI a cargar no se encuentre ya en el arreglo
     @param array $pasajeros son los pasajeros ya cargados
-    @return int $dniPasajeros */
-function verificaDNI($viaje){
+    @return int $dniPasajero */
+function verificaDNI($pasajeros){
     do{
         $ciclo = false;
         echo 'Ingrese el DNI del pasajero: ' . "\n";
         $dniPasajero = trim(fgets(STDIN));
         if (!is_int($dniPasajero)){
+            //Verifica si se ingresó un dato de 7 u 8 numeros
             if (verificaFormatoDNI($dniPasajero)){
                 echo 'El DNI ingresado es invalido, intente nuevamente' . "\n";
                 $ciclo = true;
             } else {
-                $existe = $viaje->buscaPasajero($dniPasajero);
-                if ($existe <> -1){
+                //Verifica si el pasajero ya fueron pedidos por consola pero no ingresados todavía, para no repetir registros
+                $existe = recorrePasajeros($dniPasajero,$pasajeros);
+                if ($existe){
                     echo 'El DNI ingresado ya se encontraba cargado, intente con otro'. "\n";
                     $ciclo = true;
                 }
@@ -60,11 +64,21 @@ function verificaDNI($viaje){
     return $dniPasajero;
 }
 
-/* Verifica que se ingrese algo y no quede vacío
-    @param string $stringAMostrar
-    @return $nombrePasajero */
+function recorrePasajeros($dniPasajero,$pasajeros){
+    $i = 0;
+    $encontro = false;
+    while($i < count($pasajeros) && !$encontro){
+        $encontro = $pasajeros[$i]->getDni() == $dniPasajero;
+        $i++;
+    }
+    return $encontro;
+}
+
+/** Verifica que se ingrese algo y no quede vacío
+*@param string $stringAMostrar
+*@return $dato 
+*/
 function verificaIngreso($stringAMostrar){
-    
     do{
         echo $stringAMostrar;
         $dato = trim(fgets(STDIN));
@@ -72,20 +86,18 @@ function verificaIngreso($stringAMostrar){
     return $dato;
 }
 
-/* Esta función se encarga de realizar la carga de los pasajeros 
- @param int $cantMax es la cantidad máxima de pasajeros que van en un  viaje
- @return array $pasajeros */
-function cargaPasajeros($cantMax,$viaje){
-
+/** Esta función se encarga de realizar la carga de los pasajeros 
+ *@param int $cantMax es la cantidad máxima de pasajeros que van en un  viaje
+ *@param Viaje $viaje
+ *@return array $pasajeros */
+function cargaPasajeros($cantMax){
     $pasajeros = array();
     do {
     if (count($pasajeros) < $cantMax){
-        $dniPasajero = verificaDNI($viaje);
+        $dniPasajero = verificaDNI($pasajeros);
         $nombrePasajero = verificaIngreso("Ingrese el nombre del pasajero: \n");
         $apellidoPasajero = verificaIngreso("Ingrese el apellido del pasajero: \n");
-        $datosPasajero = array("dni" => $dniPasajero,
-                          "nombre" => $nombrePasajero,
-                          "apellido" => $apellidoPasajero);
+        $datosPasajero = new Pasajero($dniPasajero, $nombrePasajero, $apellidoPasajero);
         array_push($pasajeros, $datosPasajero);
         $respuesta = pregunta();
     }else{
@@ -99,16 +111,14 @@ function cargaPasajeros($cantMax,$viaje){
     @param int $cantMax es la cantidad máxima de pasajeros que van en un  viaje
     @param array $pasajeros
      @return array $pasajeros */
-function cargaPasajeros2($pasajeros, $cantMax){
-
+function cargaPasajeros2($viaje, $cantMax){
+        $pasajeros = $viaje->getPasajeros();
         do {
-            if (count($pasajeros) > $cantMax){
+            if (count($pasajeros) < $cantMax){
             $dniPasajero = verificaDNI($pasajeros);
             $nombrePasajero = verificaIngreso("Ingrese el nombre del pasajero: \n");
             $apellidoPasajero = verificaIngreso("Ingrese el apellido del pasajero: \n");
-            $datosPasajero = array("dni" => $dniPasajero,
-                              "nombre" => $nombrePasajero,
-                              "apellido" => $apellidoPasajero);
+            $datosPasajero = new Pasajero($dniPasajero,$nombrePasajero,$apellidoPasajero);
             array_push($pasajeros, $datosPasajero);
             $respuesta = pregunta(); 
         }else{
@@ -237,8 +247,9 @@ do {
             $codViaje = verificaIngreso("Ingrese el código del viaje: \n");;
             $des = verificaIngreso("Ingrese el destino: \n");;
             $cantMax = verificaIngreso("Ingrese la cantidad máxima de pasajeros: \n");;
-            $pasajeros = cargaPasajeros($cantMax,$viaje);
-            $viaje = new Viaje($codViaje, $des, $cantMax, $pasajeros);
+            $pasajeros = cargaPasajeros($cantMax);
+            $responsable = new ResponsableV(32,32,"si","prueba");
+            $viaje = new Viaje($codViaje, $des, $cantMax, $pasajeros,$responsable);
             $ingresaUsuario = llamaMenu();
             break;
         case 2: 
@@ -268,8 +279,8 @@ do {
             break;
         case 4:
             if (!empty($viaje)){
-            $pasajerosNuevo = $viaje->getPasajeros();
-            $pasajerosNuevo = cargaPasajeros2($pasajerosNuevo, $viaje->getCantMaximaPasajeros());
+            //$pasajerosNuevo = $viaje->getPasajeros();
+            $pasajerosNuevo = cargaPasajeros2($viaje, $viaje->getCantMaximaPasajeros());
             $viaje->setPasajeros($pasajerosNuevo);
             echo 'Se ha ingresado el nuevo pasajero correctamente' . "\n";
             $ingresaUsuario = llamaMenu();

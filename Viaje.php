@@ -6,13 +6,15 @@ class Viaje{
     private $destino;
     private $cantMaximaPasajeros;
     private $pasajeros;
+    private $responsable;
 
     /************* Metodo constructor *************/
-    public function __construct($codviaje, $des, $cantmaxpasajeros, $pas){
+    public function __construct($codviaje, $des, $cantmaxpasajeros, $pas,$res){
         $this->cod_viaje = $codviaje;
         $this->destino = $des;
         $this->cantMaximaPasajeros = $cantmaxpasajeros;
         $this->pasajeros = $pas;
+        $this->responsable = $res;
     }
 
     /*************** SETTERS Y GETTERS ********************/
@@ -60,6 +62,18 @@ class Viaje{
     public function getPasajeros(){
         return $this->pasajeros;
     }
+     /** Coloca el valor pasado por parámetro en el atributo responsable 
+    *@param Responsable $res 
+    */
+    public function setResponsable($res){
+        $this->responsable = $responsable;
+    }
+    /** Devuelve el valor actual almacenado en el atributo responsable
+    * @return Responsable $responsable
+    */
+    public function getResponsable(){
+        return $this->responsable;
+    }
 
     /************ METODOS PROPIOS DE LA CLASE ************/
 
@@ -69,8 +83,9 @@ class Viaje{
     public function mostrarPasajeros(){
         $colPasajeros = $this->getPasajeros();
         for ($i=0;$i < count($colPasajeros); $i++){
-            echo $colPasajeros[$i];
+            $mensaje .= '---------------' . "\n" . $colPasajeros[$i] . "\n";
         }
+        return $mensaje;
     }
     /** Este método se encarga de buscar un pasajero en el arreglo de pasajeros, busca por DNI.
      * @param int $dniABuscar
@@ -148,6 +163,7 @@ class Viaje{
         return "Código de viaje: " . $this->getCodViaje() . "\n".  
         "Destino: " . $this->getDestino() . "\n" .
         "Cantidad máxima de pasajeros: " . $this->getCantMaximaPasajeros() . "\n".
+        "Responsable: " . "\n" .$this->getResponsable() . "\n" . 
         $this->mostrarPasajeros();
     }   
 }

@@ -36,5 +36,12 @@ class ResponsableV{
     public function getApellido(){
         return $this->apellido;
     }
+
+    public function __toString(){
+        return 'Número de empleado: '. $this->getNumEmpleado() . "\n". 
+        'Número de licencia: ' . $this->getNumLicencia() . "\n". 
+        'Nombre: ' . $this->getNombre() . "\n" . 
+        'Apellido: ' . $this->getApellido() . "\n";
+    }
 }
 ?>
