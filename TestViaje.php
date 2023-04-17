@@ -180,7 +180,7 @@ function modificarViaje($viaje, $modificacion){
 function compruebaDNIAModificar($dniModificar,$viaje){
   
     if (!verificaFormatoDNI($dniModificar)){
-        $existe = $viaje->buscaPasajero($dniAModificar);
+        $existe = $viaje->buscaPasajero($dniModificar);
         $encontrado = ($existe <> -1);
     }
     return $encontrado;
@@ -204,6 +204,7 @@ function modificarPasajero($dniPasajero,$modificacion,$viaje){
             $viaje->modificarApellidoPasajero($dniPasajero, $nuevoApellido);
             break;
     }
+    return $viaje;
 }
 /*Esta función se encarga de eliminar pasajeros, busca por el DNI 
     @param int $dniAEliminar
@@ -214,7 +215,7 @@ function eliminaPasajeros($dniAEliminar,$pasajerosEliminar){
     $i = 0;
     $encontrado = false;
     while($i < count($pasajerosEliminar) && !$encontrado){
-        $encontrado = $pasajerosEliminar[$i]['dni'] == $dniAEliminar;
+        $encontrado = $pasajerosEliminar[$i]->getDni() == $dniAEliminar;
         $i++;
     }
     array_splice($pasajerosEliminar,$i-1,1);
@@ -228,12 +229,10 @@ function muestraPasajero($dniAMostrar,$pasajerosCargados){
     $i = 0;
     $encontrado = false;
     while($i < count($pasajerosCargados) && !$encontrado){
-        $encontrado = $pasajerosCargados[$i]['dni'] == $dniAMostrar;
+        $encontrado = $pasajerosCargados[$i]->getDni() == $dniAMostrar;
         if ($encontrado){
             echo "Pasajero: " . ($i+1) . "\n";
-            echo "DNI: ". $pasajerosCargados[$i]['dni']."\n";
-            echo "Nombre: ". $pasajerosCargados[$i]['nombre']."\n";
-            echo "Apellido: ". $pasajerosCargados[$i]['apellido']."\n";
+            echo $pasajerosCargados[$i]."\n";
         } else {
         $i++;}
     }
@@ -279,7 +278,6 @@ do {
             break;
         case 4:
             if (!empty($viaje)){
-            //$pasajerosNuevo = $viaje->getPasajeros();
             $pasajerosNuevo = cargaPasajeros2($viaje, $viaje->getCantMaximaPasajeros());
             $viaje->setPasajeros($pasajerosNuevo);
             echo 'Se ha ingresado el nuevo pasajero correctamente' . "\n";
@@ -308,9 +306,8 @@ do {
                 echo "3) Apellido \n";
                 $modificacion = trim(fgets(STDIN));
                 }while(empty($modificacion) || !is_numeric($modificacion));
-                $pasajerosModificar = modificarPasajero($dniAModificar,$modificacion,$viaje);
+                $viaje = modificarPasajero($dniAModificar,$modificacion,$viaje);
                 echo 'Se ha modificado el pasajero correctamente' . "\n";
-                $viaje->setPasajeros($pasajerosModificar);
                 $ingresaUsuario = llamaMenu();
             } else {
                 echo 'Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo' . "\n";
@@ -330,9 +327,10 @@ do {
                     $ciclo = false;
                 }
                 }while(empty($dniAEliminar) || $ciclo);
-                $pasajerosEliminar = eliminaPasajeros($dniAEliminar,$pasajerosEliminar);
+                //$pasajerosEliminar = eliminaPasajeros($dniAEliminar,$pasajerosEliminar);
+                $viaje->eliminaPasajeros($dniAEliminar);
                 echo 'Se ha eliminado el pasajero correctamente' . "\n";
-                $viaje->setPasajeros($pasajerosEliminar);
+                //$viaje->setPasajeros($pasajerosEliminar);
                 $ingresaUsuario = llamaMenu();
             } else{
                 echo 'Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo' . "\n";

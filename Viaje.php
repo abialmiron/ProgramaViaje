@@ -81,6 +81,7 @@ class Viaje{
      *  @return string $mensaje
      */
     public function mostrarPasajeros(){
+        $mensaje = '';
         $colPasajeros = $this->getPasajeros();
         for ($i=0;$i < count($colPasajeros); $i++){
             $mensaje .= '---------------' . "\n" . $colPasajeros[$i] . "\n";
@@ -101,7 +102,7 @@ class Viaje{
             $i++;
         }
         if($encontro){
-            $i--;
+            $i = $i - 1;
         } else {
             $i = -1;
         }
@@ -160,11 +161,12 @@ class Viaje{
     }
 
     public function __toString(){
+        $mensaje = $this->mostrarPasajeros();
         return "Código de viaje: " . $this->getCodViaje() . "\n".  
         "Destino: " . $this->getDestino() . "\n" .
         "Cantidad máxima de pasajeros: " . $this->getCantMaximaPasajeros() . "\n".
         "Responsable: " . "\n" .$this->getResponsable() . "\n" . 
-        $this->mostrarPasajeros();
+        $mensaje;
     }   
 }
 ?>
