@@ -69,12 +69,8 @@ class Viaje{
     public function mostrarPasajeros(){
         $colPasajeros = $this->getPasajeros();
         for ($i=0;$i < count($colPasajeros); $i++){
-            $mensaje .= "Pasajero: " . ($i+1) . "\n";
-            $mensaje .= "DNI: ". $colPasajeros[$i]['dni']."\n";
-            $mensaje .= "Nombre: ". $colPasajeros[$i]['nombre']."\n";
-            $mensaje .= "Apellido: ". $colPasajeros[$i]['apellido']."\n";
+            echo $colPasajeros[$i];
         }
-        return $mensaje;
     }
     /** Este método se encarga de buscar un pasajero en el arreglo de pasajeros, busca por DNI.
      * @param int $dniABuscar
@@ -86,7 +82,7 @@ class Viaje{
         $encontro = false;
         $longitud = count($colPasajeros);
         while($i < $longitud && !$encontro){
-            $encontro = $colPasajeros[$i]['dni'] == $dniABuscar;
+            $encontro = $colPasajeros[$i]->getDni() == $dniABuscar;
             $i++;
         }
         if($encontro){
@@ -103,7 +99,7 @@ class Viaje{
     public function modificarDniPasajero($dniABuscar, $dniCambio){
         $indice = $this->buscaPasajero($dniABuscar);
         $colPasajeros = $this->getPasajeros();
-        $colPasajeros[$indice]['dni'] = $dniCambio;
+        $colPasajeros[$indice]->setDni($dniCambio);
         $this->setPasajeros($colPasajeros);
     }
     /** Este método se encarga de modificar el nombre de un pasajero, buscandolo por su DNI.
@@ -113,7 +109,7 @@ class Viaje{
     public function modificarNombrePasajero($dniDelPasajero, $nuevoNombre){
         $indice = $this->buscaPasajero($dniDelPasajero);
         $colPasajeros = $this->getPasajeros();
-        $colPasajeros[$indice]['nombre'] = $nuevoNombre;
+        $colPasajeros[$indice]->setNombre($nuevoNombre);
         $this->setPasajeros($colPasajeros);
     }
     /** Este método se encarga de modificar el apellido de un pasajero, buscandolo por su DNI.
@@ -123,7 +119,7 @@ class Viaje{
     public function modificarApellidoPasajero($dniDelPasajero, $nuevoApellido){
         $indice = $this->buscaPasajero($dniDelPasajero);
         $colPasajeros = $this->getPasajeros();
-        $colPasajeros[$indice]['apellido'] = $nuevoApellido;
+        $colPasajeros[$indice]->setApellido($nuevoApellido);
         $this->setPasajeros($colPasajeros);
     }
     /** Este método se encarga de agregar un nuevo pasajero en la colección de pasajeros
@@ -134,9 +130,18 @@ class Viaje{
     public function agregarPasajero($dniNuevo, $nombreNuevo,$apellidoNuevo){
         $colPasajeros = $this->getPasajeros();
         if($this->getCantMaximaPasajeros() >= count($colPasajeros)){
-            $colPasajeros[] = ["dni" => $dniNuevo,"nombre" => $nombreNuevo, "apellido" => $apellidoNuevo];
+            $colPasajeros[] = new Pasajero($dniNuevo,$nombreNuevo,$apellidoNuevo);
             $this->setPasajeros($colPasajeros);
         }
+    }
+    /** Este método se encarga de eliminar el pasajero buscandolo por su DNI.
+     * @param int $dniDelPasajero
+     */
+    public function eliminaPasajero($dniDelPasajero){
+        $indice = $this->buscaPasajero($dniDelPasajero);
+        $colPasajeros = $this->getPasajeros();
+        array_splice($colPasajeros,$indice,1);
+        $this->setPasajeros($colPasajeros);
     }
 
     public function __toString(){
