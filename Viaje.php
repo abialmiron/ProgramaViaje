@@ -66,7 +66,7 @@ class Viaje{
     *@param Responsable $res 
     */
     public function setResponsable($res){
-        $this->responsable = $responsable;
+        $this->responsable = $res;
     }
     /** Devuelve el valor actual almacenado en el atributo responsable
     * @return Responsable $responsable

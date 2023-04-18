@@ -16,10 +16,11 @@ function llamaMenu(){
         echo "5) Modificar un pasajero"."\n";
         echo "6) Eliminar un pasajero"."\n";
         echo "7) Ver datos de un pasajero"."\n";
+        echo "8) Modificar datos del responsable"."\n";
         echo "Si desea terminar con el programa, ingrese 0" . "\n";
         $respuesta = trim(fgets(STDIN));
     
-        }while(($respuesta<0  || $respuesta>8) || !is_numeric($respuesta));
+        }while(($respuesta<0  || $respuesta>9) || !is_numeric($respuesta));
         return $respuesta;
 }
 //Verifica que el dni ingresado sea de 7 u 8 dígitos.
@@ -237,17 +238,47 @@ function muestraPasajero($dniAMostrar,$pasajerosCargados){
         $i++;}
     }
 }
-
+/** Esta función se encarga de crear el objeto Responsable
+   * @return Responsable $responsable*/
+function cargaResponsable(){
+    $numEmpleado = verificaIngreso("Ingrese el número de empleado del responsable: \n");
+    $numLicencia = verificaIngreso("Ingrese el número de licencia del responsable: \n");
+    $nombre = verificaIngreso("Ingrese el nombre del responsable: \n");
+    $apellido = verificaIngreso("Ingrese el apellido del responsable: \n");
+    $responsable = new ResponsableV($numEmpleado,$numLicencia,$nombre,$apellido);
+    return $responsable;
+}
+function modificaResponsable($responsable,$modificacion){
+    switch($modificacion){
+        case 1:
+            $numEmpleado = verificaIngreso("Ingrese el nuevo número de empleado: \n");
+            $responsable->setNumEmpleado($numEmpleado);
+            break;
+        case 2:
+            $numLicencia = verificaIngreso("Ingrese el nuevo número de licencia: \n");
+            $responsable->setNumLicencia($numLicencia);
+            break;
+        case 3:
+            $nombre = verificaIngreso("Ingrese el nuevo nombre: \n");
+            $responsable->setNombre($nombre);
+            break;
+        case 4:
+            $apellido = verificaIngreso("Ingrese el nuevo apellido: \n");
+            $responsable->setApellido($apellido);
+            break;        
+    }
+    return $responsable;
+}
 /*------- PROGRAMA PRINCIPAL -------*/
 $ingresaUsuario = llamaMenu();
 do {
     switch($ingresaUsuario){
         case 1: 
-            $codViaje = verificaIngreso("Ingrese el código del viaje: \n");;
+            $codViaje = verificaIngreso("Ingrese el código del viaje: \n");
             $des = verificaIngreso("Ingrese el destino: \n");;
             $cantMax = verificaIngreso("Ingrese la cantidad máxima de pasajeros: \n");;
             $pasajeros = cargaPasajeros($cantMax);
-            $responsable = new ResponsableV(32,32,"si","prueba");
+            $responsable = cargaResponsable();
             $viaje = new Viaje($codViaje, $des, $cantMax, $pasajeros,$responsable);
             $ingresaUsuario = llamaMenu();
             break;
@@ -327,10 +358,8 @@ do {
                     $ciclo = false;
                 }
                 }while(empty($dniAEliminar) || $ciclo);
-                //$pasajerosEliminar = eliminaPasajeros($dniAEliminar,$pasajerosEliminar);
-                $viaje->eliminaPasajeros($dniAEliminar);
+                $viaje->eliminaPasajero($dniAEliminar);
                 echo 'Se ha eliminado el pasajero correctamente' . "\n";
-                //$viaje->setPasajeros($pasajerosEliminar);
                 $ingresaUsuario = llamaMenu();
             } else{
                 echo 'Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo' . "\n";
@@ -353,6 +382,22 @@ do {
                 muestraPasajero($dniAMostrar,$pasajerosCargados);
                 $ingresaUsuario = llamaMenu();
             } else {
+                echo 'Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo' . "\n";
+                $ingresaUsuario = llamaMenu();
+            }
+        break;
+        case 8:
+            if (!empty($viaje)){
+                do {
+                    echo "Ingrese que desea modificar: \n 1) Nro de empleado \n 2) Nro de licencia \n 3) Nombre \n 4) Apellido \n";
+                    $modificacion = trim(fgets(STDIN));
+                }while($modificacion<0 || $modificacion>4);
+                $responsable = $viaje->getResponsable();
+                $responsable =modificaResponsable($responsable,$modificacion);
+                $viaje->setResponsable($responsable);
+                $ingresaUsuario = llamaMenu();
+            }
+            else {
                 echo 'Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo' . "\n";
                 $ingresaUsuario = llamaMenu();
             }
