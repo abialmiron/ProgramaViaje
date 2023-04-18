@@ -391,7 +391,7 @@ do {
                 do {
                     echo "Ingrese que desea modificar: \n 1) Nro de empleado \n 2) Nro de licencia \n 3) Nombre \n 4) Apellido \n";
                     $modificacion = trim(fgets(STDIN));
-                }while($modificacion<0 || $modificacion>4);
+                }while($modificacion<0 || $modificacion>4 || !is_numeric($modificacion));
                 $responsable = $viaje->getResponsable();
                 $responsable =modificaResponsable($responsable,$modificacion);
                 $viaje->setResponsable($responsable);
