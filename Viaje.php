@@ -7,14 +7,16 @@ class Viaje{
     private $cantMaximaPasajeros;
     private $pasajeros;
     private $responsable;
+    private $costo;
 
     /************* Metodo constructor *************/
-    public function __construct($codviaje, $des, $cantmaxpasajeros, $pas,$res){
+    public function __construct($codviaje, $des, $cantmaxpasajeros, $pas,$res,$cos){
         $this->cod_viaje = $codviaje;
         $this->destino = $des;
         $this->cantMaximaPasajeros = $cantmaxpasajeros;
         $this->pasajeros = $pas;
         $this->responsable = $res;
+        $this->costo = $cos;
     }
 
     /*************** SETTERS Y GETTERS ********************/
@@ -73,6 +75,18 @@ class Viaje{
     */
     public function getResponsable(){
         return $this->responsable;
+    }
+    /** Coloca el valor pasado por parámetro en el atributo costo 
+    *@param float $costo 
+    */
+    public function setCosto($costo){
+        $this->costo = $costo;
+    }
+    /** Devuelve el valor actual almacenado en el atributo costo
+    * @return $costo
+    */
+    public function getCosto(){
+        return $this->costo;
     }
 
     /************ METODOS PROPIOS DE LA CLASE ************/
@@ -165,6 +179,7 @@ class Viaje{
         return "Código de viaje: " . $this->getCodViaje() . "\n".  
         "Destino: " . $this->getDestino() . "\n" .
         "Cantidad máxima de pasajeros: " . $this->getCantMaximaPasajeros() . "\n".
+        "Costo: " . $this->getCosto() . "\n" . 
         "Responsable: " . "\n" .$this->getResponsable() . "\n" . 
         $mensaje;
     }   

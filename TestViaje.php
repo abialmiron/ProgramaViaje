@@ -95,12 +95,21 @@ function cargaPasajeros($cantMax){
     $pasajeros = array();
     do {
     if (count($pasajeros) < $cantMax){
+        do{
         $dniPasajero = verificaDNI($pasajeros);
         $nombrePasajero = verificaIngreso("Ingrese el nombre del pasajero: \n");
         $apellidoPasajero = verificaIngreso("Ingrese el apellido del pasajero: \n");
+        $nroAsiento = verificaIngreso("Ingrese su número de asiento: \n");
+        $nroTicket = verificaIngreso("Ingrese su número de ticket: \n");
+        $tipoPasajero = verificaIngreso("Ingrese: \n 1 si es pasajero VIP  \n 2 si tiene requerimientos especiales (posee sillas de ruedas, asistencia para el embarque o desembarque, o comidas especiales para personas con alergias o restricciones alimentarias)\n");
+        if($tipoPasajero == 1){
+            
+
+        }
         $datosPasajero = new Pasajero($dniPasajero, $nombrePasajero, $apellidoPasajero);
+        
         array_push($pasajeros, $datosPasajero);
-        $respuesta = pregunta();
+        $respuesta = pregunta();}while($ciclo);
     }else{
             echo 'No se pueden ingresar más pasajeros, ha llegado a la cantidad máxima' . "\n";
             $respuesta = false;
