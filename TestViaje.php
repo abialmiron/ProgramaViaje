@@ -87,29 +87,42 @@ function verificaIngreso($stringAMostrar){
     return $dato;
 }
 
+/** Verifica que se ingrese un número dentro de un rango especificado por el minimo y maximo (parámetros) 
+*@param string $stringAMostrar
+*@param int $min
+*@param int $max
+*@return $dato 
+*/
+function verificaIngresoNumerico($stringAMostrar, $min,$max){
+    do{
+        echo $stringAMostrar;
+        $respuesta = trim(fgets(STDIN));
+    }while(($respuesta<=$min  || $respuesta>=$max) || !is_numeric($respuesta));
+}
 /** Esta función se encarga de realizar la carga de los pasajeros 
  *@param int $cantMax es la cantidad máxima de pasajeros que van en un  viaje
  *@param Viaje $viaje
  *@return array $pasajeros */
 function cargaPasajeros($cantMax){
+    $ciclo = false;
     $pasajeros = array();
     do {
     if (count($pasajeros) < $cantMax){
-        do{
+        
         $dniPasajero = verificaDNI($pasajeros);
         $nombrePasajero = verificaIngreso("Ingrese el nombre del pasajero: \n");
         $apellidoPasajero = verificaIngreso("Ingrese el apellido del pasajero: \n");
         $nroAsiento = verificaIngreso("Ingrese su número de asiento: \n");
         $nroTicket = verificaIngreso("Ingrese su número de ticket: \n");
-        $tipoPasajero = verificaIngreso("Ingrese: \n 1 si es pasajero VIP  \n 2 si tiene requerimientos especiales (posee sillas de ruedas, asistencia para el embarque o desembarque, o comidas especiales para personas con alergias o restricciones alimentarias)\n");
+        do{$tipoPasajero = verificaIngreso("Ingrese: \n 1 si es pasajero VIP  \n 2 si tiene requerimientos especiales (posee sillas de ruedas, asistencia para el embarque o desembarque, o comidas especiales para personas con alergias o restricciones alimentarias)\n 0 si no cumple ninguna de las opciones anteriores");
         if($tipoPasajero == 1){
-            
+            $requiereSilla = verificaIngreso("Ingrese 1 apellido del pasajero: \n");
 
-        }
+        }}while($ciclo);
         $datosPasajero = new Pasajero($dniPasajero, $nombrePasajero, $apellidoPasajero);
         
         array_push($pasajeros, $datosPasajero);
-        $respuesta = pregunta();}while($ciclo);
+        $respuesta = pregunta();
     }else{
             echo 'No se pueden ingresar más pasajeros, ha llegado a la cantidad máxima' . "\n";
             $respuesta = false;

@@ -8,6 +8,7 @@ class Viaje{
     private $pasajeros;
     private $responsable;
     private $costo;
+    private $sumCosto;
 
     /************* Metodo constructor *************/
     public function __construct($codviaje, $des, $cantmaxpasajeros, $pas,$res,$cos){
@@ -87,6 +88,13 @@ class Viaje{
     */
     public function getCosto(){
         return $this->costo;
+    }
+
+    public function setSumCosto($sumCosto){
+        $this->sumCosto = $sumCosto;
+    }
+    public function getSumCosto(){
+        return $this->sumCosto;
     }
 
     /************ METODOS PROPIOS DE LA CLASE ************/
@@ -174,12 +182,42 @@ class Viaje{
         $this->setPasajeros($colPasajeros);
     }
 
+    public function venderPasaje($objPasajero){
+        $colPasajeros = $this->getPasajeros();
+        $cos = $this->getCosto();
+        $longitud = count($colPasajeros);
+        $cantMax = $this->getCantMaximaPasajeros();
+        $sumCosto = $this->getSumCosto();
+        
+        if($longitud < $cantMax){
+            $colPasajero[] = $objPasajero;
+            $incremento = $objPasajero->darPorcentajeIncremento();
+            $costoFinal = $cos + (($cos * $incremento) / 100); 
+        }
+        $sumCosto = $sumCosto + $costoFinal;
+        $this->setSumCosto($sumCosto);
+        return $costoFinal;
+    }
+
+    public function hayPasajesDisponible(){
+        $cantMax = $this->getCantMaximaPasajeros();
+        $colPasajeros = $this->getPasajeros();
+        $longitud = count($colPasajeros);
+        if($longitud < $cantMax){
+            $hayPasajes = true;
+        } else { 
+            $hayPasajes = false;
+        }
+        return $hayPasajes;
+    }
+
     public function __toString(){
         $mensaje = $this->mostrarPasajeros();
         return "Código de viaje: " . $this->getCodViaje() . "\n".  
         "Destino: " . $this->getDestino() . "\n" .
         "Cantidad máxima de pasajeros: " . $this->getCantMaximaPasajeros() . "\n".
         "Costo: " . $this->getCosto() . "\n" . 
+        "Suma de costos: " . $this->getSumCosto() . "\n" . 
         "Responsable: " . "\n" .$this->getResponsable() . "\n" . 
         $mensaje;
     }   
