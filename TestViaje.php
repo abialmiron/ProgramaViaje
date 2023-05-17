@@ -1,7 +1,9 @@
 <?php
-include "Viaje.php";
-include "Pasajero.php";
-include "ResponsableV.php";
+include_once "Viaje.php";
+include_once "Pasajero.php";
+include_once "ResponsableV.php";
+include_once "PasajeroNecesidadesEspeciales.php";
+include_once "PasajeroVip.php";
 
 /* Esta función se encarga de desplegar el menu en pantalla
     @return int $respuesta */
@@ -64,7 +66,18 @@ function verificaDNI($pasajeros){
     }while($ciclo);
     return $dniPasajero;
 }
-
+function transcribeBooleano($stringAMostrar){
+    do{
+        echo $stringAMostrar;
+        $dato = trim(fgets(STDIN));
+    }while(empty($dato) && ($dato<0 || $dato>2));
+    if ($dato == 1){
+        $dato = true;
+    } else { 
+        $dato = false;
+    }
+    return $dato;
+}
 function recorrePasajeros($dniPasajero,$pasajeros){
     $i = 0;
     $encontro = false;
@@ -91,44 +104,51 @@ function verificaIngreso($stringAMostrar){
 *@param string $stringAMostrar
 *@param int $min
 *@param int $max
-*@return $dato 
+*@return $respuesta 
 */
 function verificaIngresoNumerico($stringAMostrar, $min,$max){
     do{
         echo $stringAMostrar;
         $respuesta = trim(fgets(STDIN));
-    }while(($respuesta<=$min  || $respuesta>=$max) || !is_numeric($respuesta));
+    }while(($respuesta<$min  || $respuesta>$max) || !is_numeric($respuesta));
+    return $respuesta;
 }
 /** Esta función se encarga de realizar la carga de los pasajeros 
  *@param int $cantMax es la cantidad máxima de pasajeros que van en un  viaje
  *@param Viaje $viaje
  *@return array $pasajeros */
-function cargaPasajeros($cantMax){
-    $ciclo = false;
-    $pasajeros = array();
+function cargaPasajeros($viaje){
     do {
-    if (count($pasajeros) < $cantMax){
-        
-        $dniPasajero = verificaDNI($pasajeros);
+    if ($viaje->hayPasajesDisponible()){
+        $dniPasajero = verificaIngreso("Ingrese el DNI del pasajero: \n");
         $nombrePasajero = verificaIngreso("Ingrese el nombre del pasajero: \n");
         $apellidoPasajero = verificaIngreso("Ingrese el apellido del pasajero: \n");
         $nroAsiento = verificaIngreso("Ingrese su número de asiento: \n");
         $nroTicket = verificaIngreso("Ingrese su número de ticket: \n");
-        do{$tipoPasajero = verificaIngreso("Ingrese: \n 1 si es pasajero VIP  \n 2 si tiene requerimientos especiales (posee sillas de ruedas, asistencia para el embarque o desembarque, o comidas especiales para personas con alergias o restricciones alimentarias)\n 0 si no cumple ninguna de las opciones anteriores");
+        $tipoPasajero = verificaIngresoNumerico("Ingrese: \n 1 si tiene requerimientos especiales (posee sillas de ruedas, asistencia para el embarque o desembarque, o comidas especiales para personas con alergias o restricciones alimentarias)\n 2 si es pasajero VIP\n 0 si no cumple ninguna de las opciones anteriores \n",0,3);
         if($tipoPasajero == 1){
-            $requiereSilla = verificaIngreso("Ingrese 1 apellido del pasajero: \n");
-
-        }}while($ciclo);
-        $datosPasajero = new Pasajero($dniPasajero, $nombrePasajero, $apellidoPasajero);
-        
-        array_push($pasajeros, $datosPasajero);
+            $requiereSilla = transcribeBooleano("Ingrese 1 si posee silla de ruedas, 0 en el caso contrario: ");
+            $requiereAsistencia = transcribeBooleano("Ingrese 1 si necesita asistencia para el embarque o desembarque, 0 en el caso contrario: ");
+            $requiereComidas = transcribeBooleano("Ingrese 1 si necesita comidas especiales para personas con alergias o restricciones alimentarias, 0 en el caso contrario: ");
+            $datosPasajero = new PasajeroNecesidadesEspeciales($dniPasajero, $nombrePasajero, $apellidoPasajero, $nroAsiento, $nroTicket, $requiereSilla, $requiereAsistencia,$requiereComidas);
+        } else {
+            if($tipoPasajero == 2){
+                $cantMillas = verificaIngreso("Ingrese la cantidad de millas que posee: \n");
+                $nroViajeroFrecuente = verificaIngreso("Ingrese su número de viajero frecuente: \n");
+                $datosPasajero = new PasajeroVip($dniPasajero, $nombrePasajero, $apellidoPasajero, $nroAsiento, $nroTicket,$nroViajeroFrecuente,$cantMillas);
+            } else {
+                $datosPasajero = new Pasajero($dniPasajero, $nombrePasajero, $apellidoPasajero, $nroAsiento, $nroTicket);
+            }
+        }
+        //array_push($pasajeros, $datosPasajero);
+        echo 'Costo final del pasajero ' . $viaje->venderPasaje($datosPasajero) . "\n";
         $respuesta = pregunta();
     }else{
             echo 'No se pueden ingresar más pasajeros, ha llegado a la cantidad máxima' . "\n";
             $respuesta = false;
         } 
     }while($respuesta);
-    return $pasajeros;
+    return $viaje;
 }
     /* Esta función se encarga de realizar la carga de los pasajeros cuando ya hay datos cargados previamente
     @param int $cantMax es la cantidad máxima de pasajeros que van en un  viaje
@@ -141,7 +161,23 @@ function cargaPasajeros2($viaje, $cantMax){
             $dniPasajero = verificaDNI($pasajeros);
             $nombrePasajero = verificaIngreso("Ingrese el nombre del pasajero: \n");
             $apellidoPasajero = verificaIngreso("Ingrese el apellido del pasajero: \n");
-            $datosPasajero = new Pasajero($dniPasajero,$nombrePasajero,$apellidoPasajero);
+            $nroAsiento = verificaIngreso("Ingrese su número de asiento: \n");
+            $nroTicket = verificaIngreso("Ingrese su número de ticket: \n");
+            $tipoPasajero = verificaIngresoNumerico("Ingrese: \n 1 si tiene requerimientos especiales (posee sillas de ruedas, asistencia para el embarque o desembarque, o comidas especiales para personas con alergias o restricciones alimentarias)\n 2 si es pasajero VIP\n 0 si no cumple ninguna de las opciones anteriores \n",0,3);
+            if($tipoPasajero == 1){
+                $requiereSilla = verificaIngreso("Ingrese true si posee silla de ruedas, false en el caso contrario: ");
+                $requiereAsistencia = verificaIngreso("Ingrese true si necesita asistencia para el embarque o desembarque, false en el caso contrario: ");
+                $requiereComidas = verificaIngreso("Ingrese true si necesita asistencia para el embarque o desembarque, false en el caso contrario: ");
+                $datosPasajero = new PasajeroNecesidadesEspeciales($dniPasajero, $nombrePasajero, $apellidoPasajero, $nroAsiento, $nroTicket, $requiereSilla, $requiereAsistencia,$requiereComidas);
+            } else {
+                if($tipoPasajero == 2){
+                    $cantMillas = verificaIngreso("Ingrese la cantidad de millas que posee: \n");
+                    $nroViajeroFrecuente = verificaIngreso("Ingrese su número de viajero frecuente: \n");
+                    $datosPasajero = new PasajeroVip($dniPasajero, $nombrePasajero, $apellidoPasajero, $nroAsiento, $nroTicket,$nroViajeroFrecuente,$cantMillas);
+                } else {
+                    $datosPasajero = new Pasajero($dniPasajero, $nombrePasajero, $apellidoPasajero, $nroAsiento, $nroTicket);
+                }
+            }
             array_push($pasajeros, $datosPasajero);
             $respuesta = pregunta(); 
         }else{
@@ -192,6 +228,11 @@ function modificarViaje($viaje, $modificacion){
             echo "Ingrese la cantidad máxima de pasajeros nueva: ";
             $nuevoCantMax = trim(fgets(STDIN));
             $viaje->setCantMaximaPasajeros($nuevoCantMax);
+            break;
+         case 4:
+            echo "Ingrese el costo nuevo: ";
+            $nuevoCosto = trim(fgets(STDIN));
+            $viaje->setCosto($nuevoCosto);
             break;
     }
     return $viaje;
@@ -299,9 +340,11 @@ do {
             $codViaje = verificaIngreso("Ingrese el código del viaje: \n");
             $des = verificaIngreso("Ingrese el destino: \n");;
             $cantMax = verificaIngreso("Ingrese la cantidad máxima de pasajeros: \n");;
-            $pasajeros = cargaPasajeros($cantMax);
             $responsable = cargaResponsable();
-            $viaje = new Viaje($codViaje, $des, $cantMax, $pasajeros,$responsable);
+            $costo = verificaIngreso("Ingrese el costo del viaje: \n");
+            //$pasajeros = cargaPasajeros($cantMax);
+            $viaje = new Viaje($codViaje, $des, $cantMax, [] ,$responsable,$costo);
+            $viaje = cargaPasajeros($viaje);
             $ingresaUsuario = llamaMenu();
             break;
         case 2: 
@@ -311,8 +354,9 @@ do {
                 echo '1) Código de viaje' . "\n";
                 echo '2) Destino ' . "\n";
                 echo '3) Cantidad máxima de pasajeros '."\n";
+                echo '4) Costo '."\n";
                 $modificacion = trim(fgets(STDIN));
-                } while(($modificacion<1  || $modificacion>4) || !is_numeric($modificacion));
+                } while(($modificacion<1  || $modificacion>5) || !is_numeric($modificacion));
                 $viaje = modificarViaje($viaje, $modificacion);
                 $ingresaUsuario = llamaMenu();
             } else {
@@ -331,9 +375,10 @@ do {
             break;
         case 4:
             if (!empty($viaje)){
-            $pasajerosNuevo = cargaPasajeros2($viaje, $viaje->getCantMaximaPasajeros());
-            $viaje->setPasajeros($pasajerosNuevo);
-            echo 'Se ha ingresado el nuevo pasajero correctamente' . "\n";
+            $viaje = cargaPasajeros($viaje);
+            //$pasajerosNuevo = cargaPasajeros2($viaje, $viaje->getCantMaximaPasajeros());
+            //$viaje->setPasajeros($pasajerosNuevo);
+            echo 'Se ha ingresado el/los nuevo/s pasajero/s correctamente' . "\n";
             $ingresaUsuario = llamaMenu();
             break;} else {
                 echo "Todavía no ha ingresado un viaje para poder mostrar, presione la opción 1 para hacerlo" . "\n";

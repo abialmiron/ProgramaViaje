@@ -190,12 +190,13 @@ class Viaje{
         $sumCosto = $this->getSumCosto();
         
         if($longitud < $cantMax){
-            $colPasajero[] = $objPasajero;
+            $colPasajeros[] = $objPasajero;
             $incremento = $objPasajero->darPorcentajeIncremento();
-            $costoFinal = $cos + (($cos * $incremento) / 100); 
+            $costoFinal = $cos + (($cos * $incremento)/100); 
         }
         $sumCosto = $sumCosto + $costoFinal;
         $this->setSumCosto($sumCosto);
+        $this->setPasajeros($colPasajeros);
         return $costoFinal;
     }
 

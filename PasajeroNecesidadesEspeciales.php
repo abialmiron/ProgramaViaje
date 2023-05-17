@@ -1,5 +1,5 @@
 <?php
-include "Pasajero.php";
+//include "Pasajero.php";
 class PasajeroNecesidadesEspeciales extends Pasajero{
     private $requiereSilla;
     private $requiereAsistencia;
