@@ -185,11 +185,9 @@ class Viaje{
     public function venderPasaje($objPasajero){
         $colPasajeros = $this->getPasajeros();
         $cos = $this->getCosto();
-        $longitud = count($colPasajeros);
-        $cantMax = $this->getCantMaximaPasajeros();
         $sumCosto = $this->getSumCosto();
         
-        if($longitud < $cantMax){
+        if($this->hayPasajesDisponible()){
             $colPasajeros[] = $objPasajero;
             $incremento = $objPasajero->darPorcentajeIncremento();
             $costoFinal = $cos + (($cos * $incremento)/100); 

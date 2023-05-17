@@ -60,9 +60,13 @@ class PasajeroNecesidadesEspeciales extends Pasajero{
             if($reqAsistencia){
                 if($reqComidas){
                     $incremento = 30;
+                } else {
+                    $incremento = 15;
                 }
+            } else {
                 $incremento = 15;
             }
+        } else {
             $incremento = 15;
         }
         return $incremento;
