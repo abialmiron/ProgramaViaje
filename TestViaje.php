@@ -120,7 +120,7 @@ function verificaIngresoNumerico($stringAMostrar, $min,$max){
 function cargaPasajeros($viaje){
     do {
     if ($viaje->hayPasajesDisponible()){
-        $dniPasajero = verificaIngreso("Ingrese el DNI del pasajero: \n");
+        $dniPasajero = verificaDNI($viaje->getPasajeros());
         $nombrePasajero = verificaIngreso("Ingrese el nombre del pasajero: \n");
         $apellidoPasajero = verificaIngreso("Ingrese el apellido del pasajero: \n");
         $nroAsiento = verificaIngreso("Ingrese su número de asiento: \n");
@@ -386,7 +386,6 @@ do {
             }
         case 5:
             if (!empty($viaje)){
-                $pasajerosModificar = $viaje->getPasajeros();
                 do {
                 echo "Ingrese el DNI del pasajero a modificar: \n";
                 $dniAModificar = trim(fgets(STDIN));
@@ -414,7 +413,6 @@ do {
         break;
         case 6: 
             if(!empty($viaje)){
-                $pasajerosEliminar = $viaje->getPasajeros();
                 do {
                 echo "Ingrese el DNI del pasajero a eliminar: \n";
                 $dniAEliminar = trim(fgets(STDIN));
@@ -435,7 +433,6 @@ do {
         break;
         case 7:
             if(!empty($viaje)){
-                $pasajerosCargados = $viaje->getPasajeros();
                 do {
                 echo "Ingrese el DNI del pasajero a mostrar: \n";
                 $dniAMostrar = trim(fgets(STDIN));

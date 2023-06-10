@@ -210,6 +210,32 @@ class Viaje{
         return $hayPasajes;
     }
 
+    public function insertar(){
+		$base=new BaseDatos();
+		$resp= false;
+		$consultaInsertar="INSERT INTO viaje(idviaje, vdestino, vcantmaxpasajeros, idempresa, rnumeroempleado,vimporte,email) 
+				VALUES (".$this->getCodViaje().",'".$this->getDestino()."','".$this->getCantMaximaPasajeros()."', NULL,'".$this->getResponsable()->getNumEmpleado()."','".$this->getCosto()."','"."')";
+		
+		if($base->Iniciar()){
+
+			if($base->Ejecutar($consultaInsertar)){
+
+			    $resp=  true;
+
+			}	else {
+					$this->setmensajeoperacion($base->getError());
+					
+			}
+
+		} else {
+				$this->setmensajeoperacion($base->getError());
+			
+		}
+		return $resp;
+	}
+
+    
+
     public function __toString(){
         $mensaje = $this->mostrarPasajeros();
         return "Código de viaje: " . $this->getCodViaje() . "\n".  
